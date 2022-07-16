@@ -127,3 +127,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT=BASE_DIR/'media'
 MEDIA_URL='/media/'
+
+#para la redireccion de los usuarios al hacer login
+LOGIN_REDIRECT_URL='myapp:products'
