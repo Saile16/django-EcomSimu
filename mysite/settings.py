@@ -130,3 +130,5 @@ MEDIA_URL='/media/'
 
 #para la redireccion de los usuarios al hacer login
 LOGIN_REDIRECT_URL='myapp:products'
+#si el usuario no esta logeado e intenta ingresar al profile lo redirigimos
+LOGIN_URL='users:login'
