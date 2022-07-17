@@ -4,6 +4,7 @@ from .forms import NewUserForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Profile
+from django.contrib.auth.models import User
 # Create your views here.
 
 def register(request):
@@ -33,3 +34,9 @@ def create_profile(request):
         profile.save()    
 
     return render(request,'users/createprofile.html')
+
+def seller_profile(request,id):
+    
+    seller=User.objects.get(id=id)    
+    context={'seller':seller}
+    return render(request,'users/sellerprofile.html',context)

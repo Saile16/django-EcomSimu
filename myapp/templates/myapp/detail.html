@@ -5,9 +5,10 @@
     <div class="mt-5">{{product_detail.name}}</div>
     <div class="mt-5 text-green-500">{{product_detail.price}}</div>
     <div class="mt-5 text-gray-700">{{product_detail.desc}}</div>
-    <div class="mt-5 text-gray-700">
-      Posted by: {{product_detail.seller_name}}
-    </div>
+    Posted by:
+    <a href="{% url 'users:sellerprofile' product_detail.seller_name.id%}"
+      ><div class="mt-5 text-gray-700">{{product_detail.seller_name}}</div></a
+    >
     <div class="mt-5 text-gray-700">
       Contact: {{product_detail.seller_name.profile.contact_number}}
     </div>
