@@ -11,5 +11,7 @@ urlpatterns = [
     path('createprofile/',views.create_profile,name='createprofile'),
     path('sellerprofile/<int:id>/',views.seller_profile,name='sellerprofile'),
 
+
+
   
 ]

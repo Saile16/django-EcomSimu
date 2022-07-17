@@ -1,0 +1,14 @@
+{% extends 'myapp/base.html' %} {% block content %}
+<div class="text-2xl m-10 p-10 font-bold">----My listings</div>
+{% for product in products%}
+<div class="itemcontainer flex shadow-lg m-10 p-10">
+  <span class="w-1/5">
+    <img class="w-40 h-40" src="{{product.image.url}}" />
+  </span>
+  <span class="w-2/5">
+    <div class="font-bold text-gray-700">{{product.name}}</div>
+    <div class="text-green-500">${{product.price}}</div>
+    <div>{{product.desc}}</div>
+  </span>
+</div>
+{%endfor%} {%endblock %}

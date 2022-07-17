@@ -1,3 +1,4 @@
+from itertools import product
 from multiprocessing import context
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
@@ -54,3 +55,10 @@ def delete_product(request,id):
         product.delete()
         return redirect('/myapp/products/')
     return render(request,'myapp/delete.html',context)
+
+
+def my_listing(request):
+    #aca buscamos los productos que pertenecen a este usuario(request.user)
+    products=Product.objects.filter(seller_name=request.user)
+    context={'products':products}
+    return render(request,'myapp/mylisting.html',context)
