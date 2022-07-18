@@ -9,14 +9,27 @@ from django.views.generic import ListView,DetailView
 #para crear algo en la db se usa
 from django.views.generic.edit import CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
+from django.core.paginator import Paginator
 # Create your views here.
 def index(request):
     return HttpResponse('Hello World')
 
 #con esto listamos los productos en el home o index de la app usando funciones
 def products(request):
-    products=Product.objects.all()
-    context={'products':products}
+    page_obj=products=Product.objects.all()
+    #obtenemos el product_name para el search de productos
+    product_name=request.GET.get('product_name')    
+    if product_name!='' and product_name is not None:
+        page_obj=products.filter(name__icontains=product_name)
+    #hacer pagination con function vviews
+    paginator=Paginator(page_obj,3)
+    #usamos normalmente el products pero lo cambiamos a page_obj para poder usar
+    #la functionalidad de search
+    # paginator=Paginator(products,3)
+    page_number=request.GET.get('page')
+    page_obj=paginator.get_page(page_number)
+    # context={'products':products} 
+    context={'page_obj':page_obj}
     return render(request,'myapp/index.html',context)
     
 #Class Base view for abovce products view ListView
@@ -26,11 +39,13 @@ class ProductListView(ListView):
     model=Product
     template_name='myapp/index.html'
     context_object_name='products'
+    paginate_by=3
 
 def product_detail(request,id):
     product_detail=Product.objects.get(id=id)
     context={'product_detail':product_detail}
     return render(request,'myapp/detail.html',context)
+
 #class base view for detail product
 class ProductDetailView(DetailView):
     model=Product
