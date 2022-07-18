@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 # Create your models here.
 class Product(models.Model):
     #al poner el default en 1 decimos que el vendendor por default sera el que tenga el id 1
@@ -11,3 +12,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('myapp:products')
+        
