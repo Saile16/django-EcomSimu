@@ -10,5 +10,19 @@
     <div class="text-green-500">${{product.price}}</div>
     <div>{{product.desc}}</div>
   </span>
+  <span class="w-1/5 my-10 mx-10">
+    <a
+      class="bg-green-500 text-white font-bold px-5 py-2"
+      href="{% url 'myapp:update_product' product.id%}"
+      >Edit</a
+    >
+  </span>
+  <span class="w-1/5 my-10 mx-10">
+    <a
+      class="bg-red-500 text-white font-bold px-5 py-2"
+      href="{% url 'myapp:delete_product' product.id%}"
+      >Delete</a
+    >
+  </span>
 </div>
 {%endfor%} {%endblock %}

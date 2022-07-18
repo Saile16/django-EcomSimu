@@ -43,9 +43,14 @@
                 >Logout</a
               >
               <a
-                class="py-4 px-1 text-gray-500 font-semibold"
+                class="py-4 px-10 text-gray-500 font-semibold"
                 href="{% url 'users:profile' %}"
                 >Profile</a
+              >
+              <a
+                class="py-4 px-1 text-gray-500 font-semibold"
+                href="{% url 'myapp:mylistings' %}"
+                >My Listings</a
               >
               {% else %}
               <a
