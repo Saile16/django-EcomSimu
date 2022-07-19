@@ -14,7 +14,36 @@
     <div class="mt-5 text-gray-700">
       Contact: {{product_detail.seller_name.profile.contact_number}}
     </div>
+    <div>
+      <button class="bg-green-500 text-white px-3 py-2 mt-2" id="checkout">
+        Checkout
+      </button>
+    </div>
   </div>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script type="text/javascript">
+    var stripe = Stripe("{{ stripe_publishable_key }}");
+    var checkoutButton = document.getElementById("checkout");
+    checkoutButton.addEventListener("click", function () {
+      fetch("{% url 'myapp:api_checkout_session' id=product_detail.id %}", {
+        method: "POST",
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (session) {
+          return stripe.redirectToCheckout({ sessionId: session.sessionId });
+        })
+        .then(function (result) {
+          if (result.error) {
+            alert(result.error.message);
+          }
+        })
+        .catch(function (error) {
+          console.error("Error", error);
+        });
+    });
+  </script>
 </div>
 
 {% endblock %}

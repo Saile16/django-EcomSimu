@@ -3,13 +3,20 @@ from multiprocessing import context
 from unicodedata import name
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
-from .models import Product
+from .models import Product,OrderDetail
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView,DetailView
+from django.views.generic import ListView,DetailView,TemplateView
 #para crear algo en la db se usa
 from django.views.generic.edit import CreateView,UpdateView,DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse,reverse_lazy
 from django.core.paginator import Paginator
+from django.http.response import HttpResponseNotFound,JsonResponse
+from django.shortcuts import get_object_or_404
+
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+import json
+import stripe
 # Create your views here.
 def index(request):
     return HttpResponse('Hello World')
@@ -51,7 +58,17 @@ class ProductDetailView(DetailView):
     model=Product
     template_name='myapp/detail.html'
     context_object_name='product_detail'
-    
+    pk_url_kwarg='pk'
+
+    def get_context_data(self,**kwargs):
+        context=super(ProductDetailView,self).get_context_data(**kwargs)
+        context['stripe_publishable_key']=settings.STRIPE_PUBLISHABLE_KEY
+        return context
+        
+        
+
+
+     
 @login_required
 def add_product(request):
     if request.method=='POST':
@@ -62,14 +79,14 @@ def add_product(request):
         seller_name=request.user
         product = Product(name=name,price=price,desc=desc,image=image,seller_name=seller_name)        
         product.save()
+        print(seller_name)
     return render(request,'myapp/addproduct.html')
 
-#de esta manera estamos creando una vista para crear un producto cuando lo hacemos de eta manera
 #la clase busca el template llamado product_form.html tenemos que crearlo
+#de esta manera estamos creando una vista para crear un producto cuando lo hacemos de eta manera
 class ProductCreateView(CreateView):
     model=Product
-    fields=['name','price','desc','image','seller_name']
-    
+    fields=['seller_name','name','price','desc','image',]    
 
 def update_product(request,id):
     product_edit=Product.objects.get(id=id)
@@ -109,3 +126,55 @@ def my_listing(request):
     products=Product.objects.filter(seller_name=request.user)
     context={'products':products}
     return render(request,'myapp/mylisting.html',context)
+
+@csrf_exempt
+def create_checkout_session(request,id):
+    product = get_object_or_404(Product,pk=id)
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    checkout_session = stripe.checkout.Session.create(
+        customer_email = request.user.email,
+        
+        payment_method_types=['card'],
+        line_items=[
+            {
+                'price_data':{
+                    'currency':'usd',
+                    'product_data':{
+                        'name':product.name,
+                    },
+                    'unit_amount':int(product.price *100),
+                },
+                'quantity':1,
+            }
+        ],
+        mode='payment',
+        success_url = request.build_absolute_uri(reverse('myapp:success'))+"?session_id={CHECKOUT_SESSION_ID}",
+        cancel_url= request.build_absolute_uri(
+            reverse('myapp:failed')),
+    )
+    
+    order = OrderDetail()
+    order.customer_username = request.user.username
+    order.product = product
+    order.stripe_payment_intent = checkout_session['payment_intent']
+    order.amount = int(product.price*100)
+    order.save()
+    return JsonResponse({'sessionId':checkout_session.id})
+
+class PaymentSuccessView(TemplateView):
+    template_name ='myapp/payment_success.html'
+    
+    def get(self,request,*args,**kwargs):
+        session_id = request.GET.get('session_id')
+        if session_id is None:
+            return HttpResponseNotFound()
+        session = stripe.checkout.Session.retrieve(session_id)
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        order = get_object_or_404(OrderDetail,stripe_payment_intent=session.payment_intent)
+        order.has_paid = True
+        order.save()
+        return render(request,self.template_name)
+    
+class PaymentFailedView(TemplateView):
+    template_name = 'myapp/payment_failed.html'
+    
