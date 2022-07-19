@@ -9,7 +9,10 @@
         <div class="flex justify-between">
           <div class="flex space-x-7">
             <div>
-              <a href="#" class="flex items-center px-2 py-4">
+              <a
+                href="{% url 'myapp:products'%}"
+                class="flex items-center px-2 py-4"
+              >
                 <img
                   class="h-8 w-8"
                   src="{% static 'myapp/images/shopping.png' %}"
