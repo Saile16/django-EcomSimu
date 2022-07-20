@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-imrzlq5s(a#v4*3tx)ln=npjdf^fgi2xp2vv&(+m@2rq^6==l5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 if DEBUG:
     STRIPE_PUBLISHABLE_KEY='pk_test_51LN1awCAUAELLcJ9wVNnw1WrJhRcrBKWN4f0L6KKPKMgpNFg9sTs2ZCpIW51F2WZ2zJbBCsLEqBkouzUZM7F5AT200NEmxkp46'
     STRIPE_SECRET_KEY='sk_test_51LN1awCAUAELLcJ9wqTQFz7AwhnKpbTZyZuSK1xvpgVvjR16VaE0VQv13FDq6gOzVvHqwo656NMdcfa1RXeuttZk00eFELB5B6'
